@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amore Mio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --parchment: #f5f0e8;
+            --parchment-dark: #ebe5d9;
+            --ink: #2c2c2c;
+            --ink-light: #555;
+            --accent: saddlebrown;
+            --accent-light: #c4956a;
+            --rule: #8b4513;
+            --rule-light: #d4a574;
+            --card-bg: #faf7f2;
+            --green: #2d6a4f;
+            --red: #9b2226;
+            --gold: #b68d40;
+            --wordle-correct: #6aaa64;
+            --wordle-present: #c9b458;
+            --wordle-absent: #787c7e;
+            --wordle-empty: #d3d6da;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--parchment);
+            color: var(--ink);
+            font-family: 'Source Serif 4', Georgia, serif;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── MASTHEAD ───────────────────────────── */
+        .masthead {
+            text-align: center;
+            padding: 32px 0 0;
+        }
+
+        .masthead-rule-top {
+            border: none;
+            border-top: 4px double var(--rule);
+            margin-bottom: 20px;
+        }
+
+        .masthead-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            font-size: clamp(2.8rem, 7vw, 4.2rem);
+            letter-spacing: 0.02em;
+            color: var(--ink);
+            line-height: 1.1;
+        }
+
+        .masthead-subtitle {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            margin-top: 6px;
+        }
+
+        .masthead-date {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        .masthead-rule-bottom {
+            border: none;
+            border-top: 4px double var(--rule);
+            margin-top: 20px;
+        }
+
+        /* ── WEATHER BAR ────────────────────────── */
+        .weather-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            padding: 14px 0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            border-bottom: 1px solid var(--rule-light);
+        }
+
+        .weather-bar .temp-current {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .weather-bar .temp-range {
+            font-size: 0.85rem;
+        }
+
+        .weather-bar .weather-divider {
+            color: var(--rule-light);
+        }
+
+        /* ── SECTION COMMONS ────────────────────── */
+        .section {
+            padding: 32px 0;
+            border-bottom: 1px solid var(--rule-light);
+        }
+
+        .section:last-of-type {
+            border-bottom: none;
+        }
+
+        .section-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            line-height: 1.25;
+            color: var(--ink);
+            margin-bottom: 16px;
+        }
+
+        .section-body {
+            font-size: 1.05rem;
+            line-height: 1.75;
+            color: var(--ink);
+        }
+
+        .section-body a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-decoration-color: var(--accent-light);
+            text-underline-offset: 3px;
+        }
+
+        .section-body a:hover {
+            color: var(--ink);
+        }
+
+        .source-link {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-decoration: none;
+            letter-spacing: 0.03em;
+        }
+
+        .source-link:hover {
+            text-decoration: underline;
+        }
+
+        /* ── ONE GOOD THING ─────────────────────── */
+        .one-good-thing {
+            background: var(--card-bg);
+            border-left: 4px solid var(--gold);
+            padding: 24px 28px;
+            margin-top: 8px;
+        }
+
+        .one-good-thing .ogt-headline {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            line-height: 1.3;
+            margin-bottom: 10px;
+        }
+
+        .one-good-thing .ogt-body {
+            font-size: 1rem;
+            line-height: 1.75;
+        }
+
+        .one-good-thing .ogt-source {
+            margin-top: 10px;
+        }
+
+        /* ── MARKET CARDS ───────────────────────── */
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .market-card {
+            background: var(--card-bg);
+            border: 1px solid var(--rule-light);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .market-card .ticker {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            margin-bottom: 4px;
+        }
+
+        .market-card .price {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .market-card .change {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            margin-top: 2px;
+        }
+
+        .market-card .change.up { color: var(--green); }
+        .market-card .change.down { color: var(--red); }
+
+        /* ── PORTUGAL WATCH ─────────────────────── */
+        .portugal-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .portugal-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--rule-light);
+        }
+
+        .portugal-check {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .portugal-check.green { background: var(--green); color: white; }
+        .portugal-check.yellow { background: var(--gold); color: white; }
+        .portugal-check.red { background: var(--red); color: white; }
+
+        .portugal-topic {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ink-light);
+            margin-bottom: 2px;
+        }
+
+        .portugal-detail {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ── PAROLA DEL GIORNO ──────────────────── */
+        .parola-card {
+            background: var(--card-bg);
+            border: 1px solid var(--rule-light);
+            padding: 28px;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .parola-word {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            font-style: italic;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .parola-pronunciation {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            margin-bottom: 16px;
+        }
+
+        .parola-meaning {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 12px;
+        }
+
+        .parola-usage {
+            font-size: 0.95rem;
+            font-style: italic;
+            color: var(--ink-light);
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .parola-mnemonic {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--ink);
+            background: var(--parchment);
+            padding: 14px 20px;
+            border-left: 3px solid var(--gold);
+            text-align: left;
+        }
+
+        /* ── WORLD NEWS ─────────────────────────── */
+        .news-item {
+            padding: 16px 0;
+            overflow: hidden;
+        }
+
+        .news-item + .news-item {
+            border-top: 1px solid var(--parchment-dark);
+        }
+
+        .news-item .news-number {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--rule-light);
+            float: left;
+            margin-right: 16px;
+            line-height: 1;
+            margin-top: 4px;
+        }
+
+        .news-item .news-headline {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+
+        .news-item .news-summary {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--ink);
+        }
+
+        .news-item .news-source {
+            margin-top: 6px;
+        }
+
+        /* ── ARTICLE BLOCKS (Good Stuff, Giardino) ── */
+        .article-block {
+            padding: 16px 0;
+        }
+
+        .article-block + .article-block {
+            border-top: 1px solid var(--parchment-dark);
+        }
+
+        .article-headline {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .article-body {
+            font-size: 1rem;
+            line-height: 1.75;
+        }
+
+        .article-source {
+            margin-top: 8px;
+        }
+
+        /* ── GOOD BOY ───────────────────────────── */
+        .good-boy-card {
+            background: var(--card-bg);
+            border: 1px solid var(--rule-light);
+            padding: 24px 28px;
+            margin-top: 8px;
+        }
+
+        .good-boy-headline {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            line-height: 1.3;
+            margin-bottom: 10px;
+        }
+
+        .good-boy-body {
+            font-size: 1rem;
+            line-height: 1.75;
+        }
+
+        .good-boy-source {
+            margin-top: 10px;
+        }
+
+        /* ── WORDLE GAME ────────────────────────── */
+        .wordle-container {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .wordle-board {
+            display: inline-grid;
+            grid-template-rows: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .wordle-row {
+            display: grid;
+            grid-template-columns: repeat(5, 56px);
+            gap: 6px;
+        }
+
+        .wordle-tile {
+            width: 56px;
+            height: 56px;
+            border: 2px solid var(--wordle-empty);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            color: var(--ink);
+            background: transparent;
+            transition: transform 0.15s ease;
+        }
+
+        .wordle-tile.filled {
+            border-color: var(--ink-light);
+            animation: pop 0.1s ease;
+        }
+
+        .wordle-tile.correct {
+            background: var(--wordle-correct);
+            border-color: var(--wordle-correct);
+            color: white;
+        }
+
+        .wordle-tile.present {
+            background: var(--wordle-present);
+            border-color: var(--wordle-present);
+            color: white;
+        }
+
+        .wordle-tile.absent {
+            background: var(--wordle-absent);
+            border-color: var(--wordle-absent);
+            color: white;
+        }
+
+        @keyframes pop {
+            50% { transform: scale(1.12); }
+        }
+
+        @keyframes flip {
+            0% { transform: rotateX(0deg); }
+            50% { transform: rotateX(90deg); }
+            100% { transform: rotateX(0deg); }
+        }
+
+        .wordle-tile.flip {
+            animation: flip 0.5s ease;
+        }
+
+        .wordle-keyboard {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .wordle-kb-row {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 6px;
+        }
+
+        .wordle-key {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 14px 10px;
+            min-width: 32px;
+            border: none;
+            border-radius: 4px;
+            background: var(--parchment-dark);
+            color: var(--ink);
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background 0.1s;
+        }
+
+        .wordle-key:active {
+            background: var(--rule-light);
+        }
+
+        .wordle-key.wide {
+            min-width: 56px;
+            font-size: 0.7rem;
+        }
+
+        .wordle-key.correct { background: var(--wordle-correct); color: white; }
+        .wordle-key.present { background: var(--wordle-present); color: white; }
+        .wordle-key.absent { background: var(--wordle-absent); color: white; }
+
+        .wordle-message {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--ink);
+            margin-top: 12px;
+            min-height: 24px;
+        }
+
+        .wordle-hint {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 0.9rem;
+            font-style: italic;
+            color: var(--ink-light);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        /* ── QUOTE FOOTER ───────────────────────── */
+        .footer-section {
+            padding: 32px 0 48px;
+            text-align: center;
+        }
+
+        .footer-rule {
+            border: none;
+            border-top: 4px double var(--rule);
+            margin-bottom: 28px;
+        }
+
+        .footer-quote {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.25rem;
+            font-style: italic;
+            line-height: 1.5;
+            color: var(--ink);
+            max-width: 600px;
+            margin: 0 auto 10px;
+        }
+
+        .footer-attribution {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            letter-spacing: 0.05em;
+        }
+
+        .footer-endmark {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.2rem;
+            color: var(--rule-light);
+            margin-top: 24px;
+        }
+
+        /* ── MOBILE ─────────────────────────────── */
+        @media (max-width: 600px) {
+            .container { padding: 0 16px; }
+            .masthead-title { font-size: clamp(2rem, 10vw, 3rem); }
+            .weather-bar { gap: 12px; flex-wrap: wrap; }
+            .market-grid { grid-template-columns: repeat(2, 1fr); }
+            .wordle-row { grid-template-columns: repeat(5, 48px); }
+            .wordle-tile { width: 48px; height: 48px; font-size: 1.3rem; }
+            .wordle-key { padding: 12px 7px; min-width: 26px; font-size: 0.7rem; }
+            .wordle-key.wide { min-width: 44px; }
+            .news-item .news-number { font-size: 1.4rem; margin-right: 12px; }
+            .one-good-thing { padding: 18px 20px; }
+            .good-boy-card { padding: 18px 20px; }
+            .parola-card { padding: 20px; }
+            .parola-word { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ── MASTHEAD ────────────────────────────────── -->
+    <header class="masthead">
+        <hr class="masthead-rule-top">
+        <div class="masthead-date">{{DATE_DISPLAY}}</div>
+        <div class="masthead-title">Amore Mio</div>
+        <div class="masthead-subtitle">Hermosa Beach, California</div>
+        <hr class="masthead-rule-bottom">
+    </header>
+
+    <!-- ── WEATHER BAR ────────────────────────────── -->
+    <div class="weather-bar">
+        <span>Hermosa Beach</span>
+        <span class="weather-divider">|</span>
+        <span class="temp-current">{{WEATHER_CURRENT}}&#176;F</span>
+        <span class="temp-range">L {{WEATHER_LOW}}&#176; / H {{WEATHER_HIGH}}&#176;</span>
+        <span class="weather-divider">|</span>
+        <span>{{WEATHER_CONDITION}}</span>
+    </div>
+
+    <!-- ── ONE GOOD THING ─────────────────────────── -->
+    <section class="section">
+        <div class="section-label">One Good Thing</div>
+        <div class="one-good-thing">
+            <div class="ogt-headline">{{OGT_HEADLINE}}</div>
+            <div class="ogt-body">{{OGT_BODY}}</div>
+            <div class="ogt-source"><a href="{{OGT_SOURCE_URL}}" class="source-link" target="_blank">{{OGT_SOURCE_NAME}}</a></div>
+        </div>
+    </section>
+
+    <!-- ── MERCATI ────────────────────────────────── -->
+    <section class="section">
+        <div class="section-label">Mercati</div>
+        <div class="market-grid">
+            <div class="market-card">
+                <div class="ticker">S&amp;P 500</div>
+                <div class="price">{{MARKET_SP500_PRICE}}</div>
+                <div class="change {{MARKET_SP500_DIR}}">{{MARKET_SP500_CHANGE}}</div>
+            </div>
+            <div class="market-card">
+                <div class="ticker">Dow Jones</div>
+                <div class="price">{{MARKET_DOW_PRICE}}</div>
+                <div class="change {{MARKET_DOW_DIR}}">{{MARKET_DOW_CHANGE}}</div>
+            </div>
+            <div class="market-card">
+                <div class="ticker">Nasdaq</div>
+                <div class="price">{{MARKET_NASDAQ_PRICE}}</div>
+                <div class="change {{MARKET_NASDAQ_DIR}}">{{MARKET_NASDAQ_CHANGE}}</div>
+            </div>
+            <div class="market-card">
+                <div class="ticker">10Y Treasury</div>
+                <div class="price">{{MARKET_10Y_PRICE}}</div>
+                <div class="change {{MARKET_10Y_DIR}}">{{MARKET_10Y_CHANGE}}</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── PORTOGALLO ─────────────────────────────── -->
+    <section class="section">
+        <div class="section-label">Portogallo</div>
+        <div class="section-title">Portugal Watch</div>
+        <div class="portugal-grid">
+            {{PORTUGAL_ITEMS}}
+        </div>
+    </section>
+
+    <!-- ── PAROLA DEL GIORNO ──────────────────────── -->
+    <section class="section">
+        <div class="section-label">Parola del Giorno</div>
+        <div class="parola-card">
+            <div class="parola-word">{{PAROLA_WORD}}</div>
+            <div class="parola-pronunciation">{{PAROLA_PRONUNCIATION}}</div>
+            <div class="parola-meaning">{{PAROLA_MEANING}}</div>
+            <div class="parola-usage">{{PAROLA_USAGE}}</div>
+            <div class="parola-mnemonic">{{PAROLA_MNEMONIC}}</div>
+        </div>
+    </section>
+
+    <!-- ── WORLD NEWS ─────────────────────────────── -->
+    <section class="section">
+        <div class="section-label">World News</div>
+        <div class="section-title">Three Things Worth Knowing</div>
+
+        <div class="news-item">
+            <div class="news-number">1</div>
+            <div>
+                <div class="news-headline">{{NEWS1_HEADLINE}}</div>
+                <div class="news-summary">{{NEWS1_SUMMARY}}</div>
+                <div class="news-source"><a href="{{NEWS1_SOURCE_URL}}" class="source-link" target="_blank">{{NEWS1_SOURCE_NAME}}</a></div>
+            </div>
+        </div>
+
+        <div class="news-item">
+            <div class="news-number">2</div>
+            <div>
+                <div class="news-headline">{{NEWS2_HEADLINE}}</div>
+                <div class="news-summary">{{NEWS2_SUMMARY}}</div>
+                <div class="news-source"><a href="{{NEWS2_SOURCE_URL}}" class="source-link" target="_blank">{{NEWS2_SOURCE_NAME}}</a></div>
+            </div>
+        </div>
+
+        <div class="news-item">
+            <div class="news-number">3</div>
+            <div>
+                <div class="news-headline">{{NEWS3_HEADLINE}}</div>
+                <div class="news-summary">{{NEWS3_SUMMARY}}</div>
+                <div class="news-source"><a href="{{NEWS3_SOURCE_URL}}" class="source-link" target="_blank">{{NEWS3_SOURCE_NAME}}</a></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── GOOD STUFF ─────────────────────────────── -->
+    <section class="section">
+        <div class="section-label">Good Stuff</div>
+        <div class="section-title">The Bright Side</div>
+
+        <div class="article-block">
+            <div class="article-headline">{{GOOD1_HEADLINE}}</div>
+            <div class="article-body">{{GOOD1_BODY}}</div>
+            <div class="article-source"><a href="{{GOOD1_SOURCE_URL}}" class="source-link" target="_blank">{{GOOD1_SOURCE_NAME}}</a></div>
+        </div>
+
+        <div class="article-block">
+            <div class="article-headline">{{GOOD2_HEADLINE}}</div>
+            <div class="article-body">{{GOOD2_BODY}}</div>
+            <div class="article-source"><a href="{{GOOD2_SOURCE_URL}}" class="source-link" target="_blank">{{GOOD2_SOURCE_NAME}}</a></div>
+        </div>
+    </section>
+
+    <!-- ── IL GIARDINO ────────────────────────────── -->
+    <section class="section">
+        <div class="section-label">Il Giardino</div>
+        <div class="section-title">Home &amp; Garden</div>
+
+        <div class="article-block">
+            <div class="article-headline">{{GARDEN1_HEADLINE}}</div>
+            <div class="article-body">{{GARDEN1_BODY}}</div>
+            <div class="article-source"><a href="{{GARDEN1_SOURCE_URL}}" class="source-link" target="_blank">{{GARDEN1_SOURCE_NAME}}</a></div>
+        </div>
+
+        <div class="article-block">
+            <div class="article-headline">{{GARDEN2_HEADLINE}}</div>
+            <div class="article-body">{{GARDEN2_BODY}}</div>
+            <div class="article-source"><a href="{{GARDEN2_SOURCE_URL}}" class="source-link" target="_blank">{{GARDEN2_SOURCE_NAME}}</a></div>
+        </div>
+    </section>
+
+    <!-- ── GOOD BOY ───────────────────────────────── -->
+    <section class="section">
+        <div class="section-label">Good Boy</div>
+        <div class="good-boy-card">
+            <div class="good-boy-headline">{{DOG_HEADLINE}}</div>
+            <div class="good-boy-body">{{DOG_BODY}}</div>
+            <div class="good-boy-source"><a href="{{DOG_SOURCE_URL}}" class="source-link" target="_blank">{{DOG_SOURCE_NAME}}</a></div>
+        </div>
+    </section>
+
+    <!-- ── WORD GAME ──────────────────────────────── -->
+    <section class="section">
+        <div class="section-label">Word Game</div>
+        <div class="section-title">Five Letters, Four Tries</div>
+        <div class="wordle-hint">Hint: {{WORDLE_HINT}}</div>
+        <div class="wordle-container">
+            <div class="wordle-board" id="wordle-board"></div>
+            <div class="wordle-message" id="wordle-message"></div>
+            <div class="wordle-keyboard" id="wordle-keyboard"></div>
+        </div>
+    </section>
+
+</div>
+
+<!-- ── QUOTE FOOTER ───────────────────────────── -->
+<div class="container">
+    <footer class="footer-section">
+        <hr class="footer-rule">
+        <div class="footer-quote">"{{QUOTE_TEXT}}"</div>
+        <div class="footer-attribution">{{QUOTE_AUTHOR}}</div>
+        <div class="footer-endmark">&#10087;</div>
+    </footer>
+</div>
+
+<!-- ── WORDLE JS ──────────────────────────────── -->
+<script>
+(function() {
+    var ANSWER = "{{WORDLE_ANSWER}}".toUpperCase();
+    var MAX_GUESSES = 4;
+    var currentRow = 0;
+    var currentTile = 0;
+    var gameOver = false;
+
+    var board = document.getElementById('wordle-board');
+    var message = document.getElementById('wordle-message');
+    var keyboard = document.getElementById('wordle-keyboard');
+
+    // Build board
+    for (var r = 0; r < MAX_GUESSES; r++) {
+        var row = document.createElement('div');
+        row.className = 'wordle-row';
+        row.id = 'row-' + r;
+        for (var c = 0; c < 5; c++) {
+            var tile = document.createElement('div');
+            tile.className = 'wordle-tile';
+            tile.id = 'tile-' + r + '-' + c;
+            row.appendChild(tile);
+        }
+        board.appendChild(row);
+    }
+
+    // Build keyboard
+    var kbRows = [
+        ['Q','W','E','R','T','Y','U','I','O','P'],
+        ['A','S','D','F','G','H','J','K','L'],
+        ['ENTER','Z','X','C','V','B','N','M','DEL']
+    ];
+
+    kbRows.forEach(function(kr) {
+        var rowDiv = document.createElement('div');
+        rowDiv.className = 'wordle-kb-row';
+        kr.forEach(function(key) {
+            var btn = document.createElement('button');
+            btn.className = 'wordle-key' + (key.length > 1 ? ' wide' : '');
+            btn.textContent = key === 'DEL' ? '\u232B' : key;
+            btn.setAttribute('data-key', key);
+            btn.addEventListener('click', function() { handleKey(key); });
+            rowDiv.appendChild(btn);
+        });
+        keyboard.appendChild(rowDiv);
+    });
+
+    // Physical keyboard
+    document.addEventListener('keydown', function(e) {
+        if (gameOver) return;
+        if (e.key === 'Enter') handleKey('ENTER');
+        else if (e.key === 'Backspace') handleKey('DEL');
+        else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
+    });
+
+    function handleKey(key) {
+        if (gameOver) return;
+
+        if (key === 'DEL') {
+            if (currentTile > 0) {
+                currentTile--;
+                var tile = document.getElementById('tile-' + currentRow + '-' + currentTile);
+                tile.textContent = '';
+                tile.classList.remove('filled');
+            }
+            return;
+        }
+
+        if (key === 'ENTER') {
+            if (currentTile < 5) {
+                message.textContent = 'Not enough letters';
+                setTimeout(function() { message.textContent = ''; }, 1200);
+                return;
+            }
+            checkGuess();
+            return;
+        }
+
+        if (currentTile < 5) {
+            var tile = document.getElementById('tile-' + currentRow + '-' + currentTile);
+            tile.textContent = key;
+            tile.classList.add('filled');
+            currentTile++;
+        }
+    }
+
+    function checkGuess() {
+        var guess = '';
+        for (var i = 0; i < 5; i++) {
+            guess += document.getElementById('tile-' + currentRow + '-' + i).textContent;
+        }
+
+        var answerArr = ANSWER.split('');
+        var result = ['absent','absent','absent','absent','absent'];
+
+        // First pass: correct
+        for (var i = 0; i < 5; i++) {
+            if (guess[i] === answerArr[i]) {
+                result[i] = 'correct';
+                answerArr[i] = null;
+            }
+        }
+        // Second pass: present
+        for (var i = 0; i < 5; i++) {
+            if (result[i] !== 'correct') {
+                var idx = answerArr.indexOf(guess[i]);
+                if (idx !== -1) {
+                    result[i] = 'present';
+                    answerArr[idx] = null;
+                }
+            }
+        }
+
+        // Reveal tiles with animation
+        for (var i = 0; i < 5; i++) {
+            (function(index) {
+                var tile = document.getElementById('tile-' + currentRow + '-' + index);
+                setTimeout(function() {
+                    tile.classList.add('flip', result[index]);
+                    updateKeyboard(guess[index], result[index]);
+                }, index * 200);
+            })(i);
+        }
+
+        setTimeout(function() {
+            if (guess === ANSWER) {
+                message.textContent = 'Brilliant!';
+                gameOver = true;
+                return;
+            }
+
+            currentRow++;
+            currentTile = 0;
+
+            if (currentRow >= MAX_GUESSES) {
+                message.textContent = 'The word was ' + ANSWER;
+                gameOver = true;
+            }
+        }, 1200);
+    }
+
+    function updateKeyboard(letter, status) {
+        var keys = document.querySelectorAll('.wordle-key');
+        keys.forEach(function(k) {
+            if (k.getAttribute('data-key') === letter) {
+                if (status === 'correct') {
+                    k.className = 'wordle-key correct';
+                } else if (status === 'present' && !k.classList.contains('correct')) {
+                    k.className = 'wordle-key present';
+                } else if (!k.classList.contains('correct') && !k.classList.contains('present')) {
+                    k.className = 'wordle-key absent';
+                }
+            }
+        });
+    }
+})();
+</script>
+
+</body>
+</html>
