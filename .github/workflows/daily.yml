@@ -48,3 +48,32 @@ jobs:
             git commit -m "Morning edition — ${DATE_LABEL}"
             git push
           fi
+
+      - name: Send SMS notification
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SMS_PHONE: ${{ secrets.SMS_PHONE }}
+        run: |
+          python - <<'EOF'
+          import os, smtplib
+          from email.mime.text import MIMEText
+
+          gmail   = os.environ["GMAIL_ADDRESS"]
+          app_pw  = os.environ["GMAIL_APP_PASSWORD"]
+          phone   = os.environ["SMS_PHONE"]
+
+          to_addr = f"{phone}@tmomail.net"
+          body    = "Good morning! Your paper is ready ☕\nhttps://flavr57.github.io/Amore-Mio/"
+
+          msg = MIMEText(body)
+          msg["From"]    = gmail
+          msg["To"]      = to_addr
+          msg["Subject"] = ""
+
+          with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+              server.login(gmail, app_pw)
+              server.sendmail(gmail, to_addr, msg.as_string())
+
+          print(f"SMS sent to {to_addr}")
+          EOF
