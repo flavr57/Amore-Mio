@@ -625,12 +625,12 @@
 
     <!-- ── WEATHER BAR ────────────────────────────── -->
     <div class="weather-bar">
-        <span>Hermosa Beach</span>
+        <span id="wb-city">Hermosa Beach</span>
         <span class="weather-divider">|</span>
-        <span class="temp-current">{{WEATHER_CURRENT}}&#176;F</span>
-        <span class="temp-range">L {{WEATHER_LOW}}&#176; / H {{WEATHER_HIGH}}&#176;</span>
+        <span id="wb-temp" class="temp-current">{{WEATHER_CURRENT}}&#176;F</span>
+        <span id="wb-range" class="temp-range">L {{WEATHER_LOW}}&#176; / H {{WEATHER_HIGH}}&#176;</span>
         <span class="weather-divider">|</span>
-        <span>{{WEATHER_CONDITION}}</span>
+        <span id="wb-condition">{{WEATHER_CONDITION}}</span>
     </div>
 
     <!-- ── ONE GOOD THING ─────────────────────────── -->
@@ -950,6 +950,61 @@
             }
         });
     }
+})();
+</script>
+
+<!-- ── LOCAL WEATHER ──────────────────────────── -->
+<script>
+(function () {
+    var WMO = {
+        0:"Sunny", 1:"Mostly Sunny", 2:"Partly Cloudy", 3:"Cloudy",
+        45:"Foggy", 48:"Icy Fog",
+        51:"Light Drizzle", 53:"Drizzle", 55:"Heavy Drizzle",
+        61:"Light Rain", 63:"Moderate Rain", 65:"Heavy Rain",
+        71:"Light Snow", 73:"Moderate Snow", 75:"Heavy Snow",
+        80:"Showers", 81:"Moderate Showers", 82:"Heavy Showers",
+        95:"Thunderstorm", 96:"Thunderstorm with Hail", 99:"Severe Thunderstorm"
+    };
+
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(function (pos) {
+        var lat = pos.coords.latitude;
+        var lon = pos.coords.longitude;
+
+        var weatherUrl =
+            'https://api.open-meteo.com/v1/forecast' +
+            '?latitude=' + lat + '&longitude=' + lon +
+            '&current=temperature_2m,weathercode' +
+            '&daily=temperature_2m_max,temperature_2m_min' +
+            '&temperature_unit=fahrenheit&timezone=auto&forecast_days=1';
+
+        var geoUrl =
+            'https://api.bigdatacloud.net/data/reverse-geocode-client' +
+            '?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=en';
+
+        Promise.all([fetch(weatherUrl), fetch(geoUrl)])
+            .then(function (responses) {
+                return Promise.all([responses[0].json(), responses[1].json()]);
+            })
+            .then(function (data) {
+                var w   = data[0];
+                var geo = data[1];
+
+                var temp      = Math.round(w.current.temperature_2m);
+                var high      = Math.round(w.daily.temperature_2m_max[0]);
+                var low       = Math.round(w.daily.temperature_2m_min[0]);
+                var condition = WMO[w.current.weathercode] || 'Variable';
+                var city      = geo.city || geo.locality || geo.principalSubdivision || 'Your Location';
+
+                document.getElementById('wb-city').textContent      = city;
+                document.getElementById('wb-temp').innerHTML         = temp + '&#176;F';
+                document.getElementById('wb-range').innerHTML        = 'L ' + low + '&#176; / H ' + high + '&#176;';
+                document.getElementById('wb-condition').textContent  = condition;
+            })
+            .catch(function () { /* silently keep baked-in weather */ });
+
+    }, function () { /* denied — keep baked-in Hermosa Beach weather */ });
 })();
 </script>
 
