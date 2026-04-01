@@ -15,6 +15,7 @@ import os
 import sys
 import json
 import re
+import time
 import datetime
 
 import requests
@@ -443,11 +444,24 @@ def main():
 
     prompt = build_prompt(today, weather, markets, news)
 
-    response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=4096,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    max_attempts = 3
+    retry_wait = 30
+    response = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = client.messages.create(
+                model="claude-sonnet-4-6",
+                max_tokens=4096,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            break
+        except anthropic.APIStatusError as e:
+            if e.status_code == 529 and attempt < max_attempts:
+                print(f"  [warn] Claude API overloaded (attempt {attempt}/{max_attempts}). Retrying in {retry_wait}s...", file=sys.stderr)
+                time.sleep(retry_wait)
+            else:
+                raise
+
 
     raw = response.content[0].text.strip()
 
