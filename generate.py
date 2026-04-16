@@ -14,9 +14,147 @@ Requires: anthropic feedparser requests yfinance
 import os
 import sys
 import json
+import random
 import re
 import time
 import datetime
+
+# ─── Daily Wordle word list ────────────────────────────────────────────────────
+
+WORDLE_WORDS = [
+    "ABBEY","ABIDE","ABODE","ABOVE","ACUTE","ADORE","AFOOT","AGILE","AGING","AGLOW",
+    "AISLE","ALARM","ALBUM","ALGAE","ALOFT","ALOOF","ALTER","AMBER","AMBLE","AMEND",
+    "AMPLE","ANGEL","ANGER","ANGLE","ANIME","ANKLE","ANVIL","APHID","APPLE","APPLY",
+    "APRIL","APRON","ARISE","ARMOR","AROMA","ARROW","ARTSY","ASIDE","ASSET","ATONE",
+    "ATTIC","AUDIT","AVAIL","AVID","AVOID","AWAKE","AWARD","AWARE","AWFUL","BACON",
+    "BADGE","BADLY","BAKER","BASED","BASIC","BASIL","BASIS","BATCH","BAYOU","BEACH",
+    "BEADY","BEGAN","BEGIN","BEING","BELLY","BELOW","BENCH","BILLY","BIRCH","BISON",
+    "BLADE","BLAND","BLANK","BLAZE","BLEAK","BLEED","BLEND","BLESS","BLISS","BLOCK",
+    "BLOND","BLOOD","BLOOM","BLOWN","BLUNT","BLURT","BLUSH","BOARD","BOAST","BOKEH",
+    "BONUS","BOOST","BOOTH","BOSSY","BOTCH","BOUGH","BOUND","BOXER","BRAID","BRAVE",
+    "BRAVO","BRAWN","BREAD","BREAK","BREED","BRICK","BRIDE","BRIEF","BRINE","BRISK",
+    "BROOD","BROOK","BROTH","BROWN","BRUNT","BRUSH","BUDDY","BUDGE","BUILT","BULGE",
+    "BUNCH","BUNNY","BURLY","BURST","BYLAW","CAMEL","CAMEO","CANAL","CANDY","CARGO",
+    "CARRY","CARVE","CEDAR","CHAIR","CHALK","CHEAP","CHECK","CHEEK","CHEER","CHESS",
+    "CHEST","CHIEF","CHILD","CHILL","CHIMP","CHOIR","CHUNK","CIDER","CIVIC","CIVIL",
+    "CLAIM","CLAMP","CLANG","CLANK","CLASH","CLASP","CLASS","CLEAN","CLEAR","CLERK",
+    "CLICK","CLIFF","CLING","CLOAK","CLOCK","CLONE","CLOSE","CLOTH","CLOUD","CLOUT",
+    "CLOVE","CLOWN","COACH","COAST","COBRA","COMET","COMIC","CORAL","COUCH","COULD",
+    "COUNT","COURT","COVER","COVET","CRAFT","CRANE","CRAVE","CRAWL","CREAK","CREEK",
+    "CRISP","CROON","CROSS","CROWD","CROWN","CRUSH","CRUSE","CRUST","CUBIC","CURLY",
+    "CYCLE","DAILY","DANCE","DANDY","DAZED","DEALT","DEBUT","DECOY","DECRY","DELVE",
+    "DENSE","DEPOT","DEPTH","DERBY","DIGIT","DIRTY","DISCO","DITTY","DIVOT","DIZZY",
+    "DODGY","DOING","DOMED","DOUGH","DRAFT","DRAIN","DRAPE","DRAWL","DREAM","DREDGE",
+    "DRINK","DRIFT","DRIVE","DROOL","DROOP","DROVE","DUCHY","DUVET","DWARF","DWELL",
+    "EAGLE","EARLY","EARTH","EASEL","EIGHT","EJECT","ELDER","ELITE","EMPTY","ENJOY",
+    "EQUAL","ERROR","ETHIC","EVOKE","EXACT","EXERT","EXILE","EXTRA","FABLE","FANCY",
+    "FEAST","FERAL","FIELD","FIERY","FIFTH","FIFTY","FIGHT","FINAL","FIRST","FIXED",
+    "FJORD","FLAME","FLANK","FLARE","FLASK","FLAIR","FLEET","FLESH","FLING","FLOCK",
+    "FLORA","FLOUR","FLUTE","FOCUS","FOGGY","FOLIO","FOLLY","FORGE","FORTH","FORTY",
+    "FORUM","FOUND","FRAIL","FRAME","FRANK","FRAUD","FRESH","FROND","FRONT","FROZE",
+    "FRUGAL","FRUIT","FULLY","FUNKY","FUNNY","GAUZY","GAVEL","GAWKY","GENRE","GHOST",
+    "GIANT","GIDDY","GIVEN","GLAND","GLARE","GLASS","GLEAM","GLIDE","GLOOM","GLOSS",
+    "GLOVE","GLYPH","GNOME","GOING","GOLEM","GOOSE","GRACE","GRADE","GRAND","GRAPE",
+    "GRASP","GRASS","GRAZE","GREET","GRIEF","GRIND","GROAN","GROIN","GROPE","GROSS",
+    "GROUP","GROVE","GROWL","GRUEL","GUESS","GUIDE","GUILD","GUILE","GUSTO","HAPPY",
+    "HARSH","HAVEN","HEART","HEAVY","HEDGE","HEIST","HELIX","HENCE","HINGE","HIPPO",
+    "HOLLY","HOMER","HORDE","HOTEL","HOUND","HOUSE","HUMAN","HUMUS","HURRY","HYENA",
+    "IDEAL","IGLOO","IMPLY","INDEX","INDIE","INFER","INFIX","INNER","INPUT","INTER",
+    "IRONY","ISSUE","IVORY","JELLY","JETTY","JEWEL","JIFFY","JOINT","JOUST","JUDGE",
+    "JUICE","JUICY","JUMPY","KARMA","KAYAK","KHAKI","KINKY","KNACK","KNEEL","KNIFE",
+    "KNOCK","KNOWN","KOALA","LANCE","LAPEL","LARCH","LASER","LATCH","LATER","LATHE",
+    "LAUDS","LAUGH","LAYER","LEAPT","LEARN","LEASE","LEASH","LEAST","LEDGE","LEMON",
+    "LEVEL","LIGHT","LINEN","LINER","LIVER","LODGE","LOFTY","LOGIC","LOOSE","LOWER",
+    "LOYAL","LUCID","LUCKY","LUNAR","LUNCH","LUSTY","LYRIC","MAGIC","MAJOR","MAMBO",
+    "MANOR","MAPLE","MARCH","MATCH","MAUVE","MAXIM","MAYOR","MEATY","MEDIA","MERCY",
+    "MERGE","MERIT","MESSY","METAL","MIGHT","MIRTH","MIXED","MODEL","MOLDY","MONKS",
+    "MONTH","MOODY","MORAL","MOSSY","MOTEL","MOTIF","MOUNT","MOURN","MOUTH","MOVED",
+    "MURAL","MUSIC","NASAL","NERVE","NEVER","NIGHT","NINJA","NOBLE","NOISE","NYMPH",
+    "OAKEN","OASIS","OCEAN","OFFER","OFTEN","OLIVE","ONSET","OPERA","ORDER","OTHER",
+    "OTTER","OUTER","OVOID","OXIDE","OZONE","PAINT","PANDA","PANEL","PANIC","PAPER",
+    "PARTY","PASTA","PATCH","PAUSE","PEACE","PEACH","PEARL","PEDAL","PERCH","PESKY",
+    "PHASE","PHONE","PHOTO","PIANO","PILOT","PIXEL","PIZZA","PLACE","PLAIN","PLANE",
+    "PLANK","PLANT","PLATE","PLAZA","PLEAD","PLUCK","PLUMB","PLUMP","PLUNGE","PLUNK",
+    "POINT","POKER","POLAR","PORCH","POWER","PRANK","PRESS","PRICE","PRICK","PRIDE",
+    "PRIME","PRINT","PRIOR","PRIZE","PROBE","PRUNE","PSALM","PULSE","PUNCH","PUPIL",
+    "QUEEN","QUERY","QUEUE","QUIET","QUOTA","QUOTE","RABBI","RADAR","RADIO","RAINY",
+    "RALLY","RANCH","RANGE","RAPID","RAVEN","REACH","REALM","REBEL","REGAL","REIGN",
+    "RELAX","REMIX","REPAY","RIDER","RIDGE","RIFLE","RISKY","RIVET","ROBIN","ROCKY",
+    "ROGUE","ROMAN","ROOST","ROUGE","ROUGH","ROUND","ROWDY","ROYAL","RUGBY","RULER",
+    "RUSTY","SADLY","SALSA","SANDY","SAUNA","SAVOR","SCALD","SCALE","SCALP","SCANT",
+    "SCARE","SCARF","SCENE","SCONE","SCOOP","SCORE","SCOUT","SCOWL","SCRUB","SEIZE",
+    "SERVO","SEVEN","SHAKE","SHALL","SHAME","SHAPE","SHARE","SHARK","SHARP","SHAVE",
+    "SHEEN","SHEER","SHELF","SHELL","SHINY","SHIRT","SHOCK","SHORE","SHORT","SHOUT",
+    "SIGHT","SINCE","SIXTH","SIXTY","SKILL","SKIMP","SKIRT","SLATE","SLEPT","SLIDE",
+    "SLIME","SLING","SLOPE","SLOTH","SMALL","SMART","SMASH","SMELL","SMILE","SMIRK",
+    "SMITE","SMOKE","SNACK","SNAIL","SNAKE","SNARE","SNEAK","SNORE","SOLAR","SOLID",
+    "SOLVE","SONIC","SORRY","SOUTH","SPACE","SPARE","SPARK","SPAWN","SPEAK","SPEAR",
+    "SPECK","SPEND","SPICY","SPIKE","SPINE","SPITE","SPLAT","SPLIT","SPOOL","SPOON",
+    "SPORT","SPRAY","SPRIG","SPUNK","SQUAD","SQUAT","SQUID","STACK","STAGE","STAIN",
+    "STALE","STALL","STAMP","STAND","STARE","START","STASH","STEEL","STEEP","STEER",
+    "STERN","STOCK","STOMP","STONE","STOOD","STORE","STORK","STORM","STOUT","STRAP",
+    "STRAW","STRAY","STRIP","STRUT","STUCK","STUDY","STUNT","STYLE","SUGAR","SUITE",
+    "SUNNY","SUPER","SURGE","SWAMP","SWARM","SWEAR","SWEET","SWEPT","SWIRL","SWOOP",
+    "TABLE","TABOO","TANGO","TAPAS","TASTE","TEETH","TEMPO","TENOR","TENSE","TEPID",
+    "THANE","THANK","THICK","THIGH","THING","THINK","THORN","THOSE","THREE","THREW",
+    "THROW","THUMB","THUMP","TIARA","TIDAL","TIGER","TIGHT","TILDE","TIMER","TITAN",
+    "TODAY","TOKEN","TONAL","TONIC","TOOTH","TOPIC","TORCH","TOUCH","TOUGH","TOWEL",
+    "TOWER","TOXIC","TRACE","TRACK","TRADE","TRAIL","TRAIN","TRAIT","TRASH","TREAT",
+    "TREND","TRIAL","TRIBE","TRICK","TRITE","TROLL","TROOP","TROPE","TROUT","TROVE",
+    "TRUCK","TRULY","TRUNK","TRUST","TRUTH","TUBER","TULIP","TUNED","TURBO","TUTOR",
+    "TWEAK","TWEED","TWEET","TWICE","TWIRL","TWIST","TYING","UDDER","ULCER","ULTRA",
+    "UNCLE","UNDER","UNDUE","UNFED","UNFIT","UNIFY","UNION","UNITE","UNITY","UNTIE",
+    "UNTIL","UPPER","UPSET","URBAN","URGED","USAGE","USHER","USING","USUAL","UTTER",
+    "VAGUE","VALET","VALID","VALOR","VALUE","VALVE","VAPID","VAPOR","VAULT","VAUNT",
+    "VEGAN","VENOM","VERGE","VERSE","VERVE","VIDEO","VIGIL","VILLA","VINYL","VIOLA",
+    "VIRAL","VISIT","VISOR","VISTA","VITAL","VIVID","VIXEN","VOCAL","VOGUE","VOICE",
+    "VOILA","VOTER","VOUCH","VOWEL","VYING","WACKY","WAFER","WAGER","WAIST","WAIVE",
+    "WALTZ","WATER","WAVER","WEARY","WEAVE","WEDGE","WEIGH","WEIRD","WHALE","WHARF",
+    "WHEAT","WHEEL","WHELP","WHERE","WHICH","WHILE","WHINE","WHIRL","WHISK","WHITE",
+    "WHOLE","WHOOP","WHORL","WHOSE","WIDEN","WIDOW","WIDTH","WIELD","WINCE","WINDY",
+    "WIPED","WIRED","WISER","WITCH","WITTY","WOMAN","WOMEN","WOODY","WOOER","WORLD",
+    "WORRY","WORSE","WORTH","WOULD","WOUND","WOVEN","WRACK","WRATH","WRECK","WREST",
+    "WRIST","WRITE","WRUNG","WRYLY","YACHT","YEAST","YIELD","YOUNG","YOUTH","ZEBRA",
+    "ZESTY",
+]
+
+WORDLE_HISTORY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".wordle_history.json")
+
+
+def daily_wordle_word(today: datetime.date) -> str:
+    """Pick a Wordle word for `today` that hasn't been used before.
+
+    History is persisted to .wordle_history.json. Calling this multiple times
+    on the same date returns the same word. When the full list is exhausted,
+    the oldest picks become eligible again (but never anything used in the
+    last 60 days).
+    """
+    iso = today.isoformat()
+    try:
+        with open(WORDLE_HISTORY_PATH) as f:
+            history = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        history = {}
+
+    if iso in history:
+        return history[iso]
+
+    used = set(history.values())
+    pool = [w for w in WORDLE_WORDS if w not in used]
+    if not pool:
+        recent_dates = sorted(history.keys())[-60:]
+        recent = {history[d] for d in recent_dates}
+        pool = [w for w in WORDLE_WORDS if w not in recent] or list(WORDLE_WORDS)
+
+    word = random.Random(iso).choice(pool)
+    history[iso] = word
+    try:
+        with open(WORDLE_HISTORY_PATH, "w") as f:
+            json.dump(history, f, indent=2, sort_keys=True)
+    except OSError as e:
+        print(f"  [warn] couldn't write wordle history: {e}", file=sys.stderr)
+    return word
+
 
 import requests
 import feedparser
@@ -175,7 +313,7 @@ def fetch_all_news() -> dict:
 
 # ─── Prompt builder ───────────────────────────────────────────────────────────
 
-def build_prompt(today: datetime.date, weather: dict, markets: dict, news: dict) -> str:
+def build_prompt(today: datetime.date, weather: dict, markets: dict, news: dict, wordle_word: str) -> str:
     date_str = today.strftime(f"%A, %B {today.day}, %Y")
 
     # Market block
@@ -235,40 +373,40 @@ NEWS — DOGS & ANIMALS:
 {fmt_news(news.get('dogs', []))}
 """
 
-    schema_section = """\
+    schema_section = f"""\
 ─────────────────────────────────────────────────
 OUTPUT: Return ONLY valid JSON (no markdown fences, no explanation) with this exact structure.
 
 CRITICAL: HTML inside JSON strings must use SINGLE QUOTES for attributes, e.g. class='x'.
 Source URLs must be copied EXACTLY from the RSS data above. Use "" if none is available.
 
-{
+{{
   "ogt_headline": "One Good Thing — an uplifting, specific story headline (8–14 words)",
   "ogt_body": "2–3 sentences. Warm, specific, makes the reader smile. Use the good news RSS if available; otherwise draw from your knowledge of genuinely uplifting recent events.",
   "ogt_source_name": "Publication name",
   "ogt_source_url": "Exact URL from RSS data, or empty string",
 
   "portugal_items": [
-    {
+    {{
       "color": "green",
       "topic": "GOLDEN VISA",
       "detail": "1–2 sentences about current Golden Visa / D8 digital nomad visa status or recent changes."
-    },
-    {
+    }},
+    {{
       "color": "yellow",
       "topic": "COST OF LIVING",
       "detail": "1–2 sentences about current cost-of-living trends in Lisbon, Porto, or the Algarve."
-    },
-    {
+    }},
+    {{
       "color": "green",
       "topic": "NHR TAX REGIME",
       "detail": "1–2 sentences about the NHR or IFICI tax benefit for new residents."
-    },
-    {
+    }},
+    {{
       "color": "yellow",
       "topic": "HOUSING MARKET",
       "detail": "1–2 sentences about the rental or property market in Portugal."
-    }
+    }}
   ],
 
   "parola_word": "An Italian word — chosen to be beautiful, useful, or evocative",
@@ -317,12 +455,11 @@ Source URLs must be copied EXACTLY from the RSS data above. Use "" if none is av
   "dog_source_name": "Publication name",
   "dog_source_url": "Exact URL from RSS data, or empty string",
 
-  "wordle_answer": "A 5-letter English word (uppercase). Satisfying to guess — not too obscure, not too easy. No proper nouns.",
-  "wordle_hint": "A gentle hint pointing toward the word's meaning or category, without giving it away.",
+  "wordle_hint": "A gentle, one-sentence hint for the word {wordle_word} — pointing toward its meaning or category without giving it away.",
 
   "quote_text": "An inspiring, elegant quote. Optimistic, timeless tone.",
   "quote_author": "Author name and optional context, e.g. 'Rainer Maria Rilke'"
-}
+}}
 
 RULES:
 1. portugal_items: always return exactly 4 items. Colors must be "green", "yellow", or "red".
@@ -331,7 +468,6 @@ RULES:
    Use actual stories from the RSS data above — do not invent sources or URLs.
 3. Garden: if garden RSS has relevant articles, use them. If not, synthesize practical advice
    from your knowledge — especially orchids, bougainvillea, and plants for air quality, stress, or sleep.
-4. wordle_answer must be exactly 5 uppercase letters. Real English word, no proper nouns.
 5. Source URLs: copy EXACTLY from RSS data. Never invent or modify a URL.
 6. Return ONLY the JSON object. Nothing before or after it.
 """
@@ -426,6 +562,7 @@ def main():
         template = f.read()
 
     today = datetime.date.today()
+    wordle_word = daily_wordle_word(today)
     date_display = today.strftime(f"%A, %B {today.day}, %Y")
 
     print(f"Generating Amore Mio — {date_display}")
@@ -442,7 +579,7 @@ def main():
     print("  Calling Claude API...")
     client = anthropic.Anthropic()
 
-    prompt = build_prompt(today, weather, markets, news)
+    prompt = build_prompt(today, weather, markets, news, wordle_word)
 
     max_attempts = 3
     retry_wait = 30
@@ -581,7 +718,7 @@ def main():
         "DOG_SOURCE_URL":     data.get("dog_source_url", "#") or "#",
         "DOG_SOURCE_NAME":    data.get("dog_source_name", ""),
         # Wordle
-        "WORDLE_ANSWER":      data.get("wordle_answer", "BEACH"),
+        "WORDLE_ANSWER":      wordle_word,
         "WORDLE_HINT":        data.get("wordle_hint", ""),
         # Quote
         "QUOTE_TEXT":         data.get("quote_text", ""),
