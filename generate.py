@@ -6,9 +6,10 @@ Fetches real data from free sources, sends to Claude API for content,
 injects into template.html, writes index.html.
 
 Usage:
-    ANTHROPIC_API_KEY=... python generate.py
+    CLAUDE_CODE_OAUTH_TOKEN=... python generate.py
 
-Requires: anthropic feedparser requests yfinance
+Requires: Claude Code CLI (`npm i -g @anthropic-ai/claude-code`),
+          feedparser, requests, yfinance
 """
 
 import os
@@ -156,9 +157,9 @@ def daily_wordle_word(today: datetime.date) -> str:
     return word
 
 
+import subprocess
 import requests
 import feedparser
-import anthropic
 
 # ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -576,31 +577,42 @@ def main():
     print("  Fetching RSS news...")
     news = fetch_all_news()
 
-    print("  Calling Claude API...")
-    client = anthropic.Anthropic()
-
+    print("  Calling Claude (via Claude Code CLI)...")
     prompt = build_prompt(today, weather, markets, news, wordle_word)
 
     max_attempts = 3
     retry_wait = 30
-    response = None
+    raw = None
     for attempt in range(1, max_attempts + 1):
         try:
-            response = client.messages.create(
-                model="claude-sonnet-4-6",
-                max_tokens=4096,
-                messages=[{"role": "user", "content": prompt}],
+            result = subprocess.run(
+                ["claude", "-p", "--model", "claude-sonnet-4-6", "--output-format", "text"],
+                input=prompt,
+                capture_output=True,
+                text=True,
+                timeout=300,
+                check=True,
             )
+            raw = result.stdout.strip()
             break
-        except anthropic.APIStatusError as e:
-            if e.status_code == 529 and attempt < max_attempts:
-                print(f"  [warn] Claude API overloaded (attempt {attempt}/{max_attempts}). Retrying in {retry_wait}s...", file=sys.stderr)
+        except subprocess.CalledProcessError as e:
+            if attempt < max_attempts:
+                print(f"  [warn] claude CLI failed (exit {e.returncode}, attempt {attempt}/{max_attempts}). Retrying in {retry_wait}s...", file=sys.stderr)
+                if e.stderr:
+                    print(f"  [stderr] {e.stderr[:500]}", file=sys.stderr)
                 time.sleep(retry_wait)
             else:
-                raise
-
-
-    raw = response.content[0].text.strip()
+                print(f"ERROR: claude CLI failed (exit {e.returncode})", file=sys.stderr)
+                if e.stderr:
+                    print(e.stderr, file=sys.stderr)
+                sys.exit(1)
+        except subprocess.TimeoutExpired:
+            if attempt < max_attempts:
+                print(f"  [warn] claude CLI timed out (attempt {attempt}/{max_attempts}). Retrying in {retry_wait}s...", file=sys.stderr)
+                time.sleep(retry_wait)
+            else:
+                print("ERROR: claude CLI timed out after all retries", file=sys.stderr)
+                sys.exit(1)
 
     # Strip markdown fences if Claude added them
     raw = re.sub(r"^```(?:json)?\s*", "", raw)
