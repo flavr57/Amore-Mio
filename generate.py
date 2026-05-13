@@ -596,15 +596,14 @@ def main():
             raw = result.stdout.strip()
             break
         except subprocess.CalledProcessError as e:
+            print(f"  [warn] claude CLI failed (exit {e.returncode}, attempt {attempt}/{max_attempts})", file=sys.stderr)
+            print(f"  [stdout] {(e.stdout or '<empty>')[:1000]}", file=sys.stderr)
+            print(f"  [stderr] {(e.stderr or '<empty>')[:1000]}", file=sys.stderr)
             if attempt < max_attempts:
-                print(f"  [warn] claude CLI failed (exit {e.returncode}, attempt {attempt}/{max_attempts}). Retrying in {retry_wait}s...", file=sys.stderr)
-                if e.stderr:
-                    print(f"  [stderr] {e.stderr[:500]}", file=sys.stderr)
+                print(f"  Retrying in {retry_wait}s...", file=sys.stderr)
                 time.sleep(retry_wait)
             else:
-                print(f"ERROR: claude CLI failed (exit {e.returncode})", file=sys.stderr)
-                if e.stderr:
-                    print(e.stderr, file=sys.stderr)
+                print(f"ERROR: claude CLI failed after {max_attempts} attempts (exit {e.returncode})", file=sys.stderr)
                 sys.exit(1)
         except subprocess.TimeoutExpired:
             if attempt < max_attempts:
