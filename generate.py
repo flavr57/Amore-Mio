@@ -168,6 +168,108 @@ HERMOSA_LON = -118.3995
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# ─── Stipendio Pigro — income-investing curriculum ────────────────────────────
+# One lesson per day, in teaching order, starting from LAUNCH_DATE.
+
+LAUNCH_DATE = datetime.date(2026, 8, 18)
+
+CURRICULUM = [
+    # — Foundations: what income investing even is —
+    "What income investing means, and how it differs from investing for growth",
+    "What a dividend actually is, in plain language",
+    "Why a company would choose to pay out cash instead of keeping it",
+    "How a share of stock makes you a part-owner entitled to a slice of profits",
+    "The four dates that matter: declaration, ex-dividend, record, and payment",
+    "How dividend yield is calculated, and what the percentage really tells you",
+    "Why a very high yield is often a warning sign rather than a bargain",
+    "Total return: why price growth and dividends have to be counted together",
+    "What a payout ratio is, and how it hints at whether a dividend is safe",
+    "Free cash flow: the number that actually pays your dividend",
+    "Dividend growth versus dividend size, and why the slower one often wins",
+    "What dividend aristocrats and dividend kings are, and what the labels mean",
+    "What happens when a company cuts its dividend, and why it matters so much",
+    "Quarterly, monthly, and annual payers: how payment schedules differ",
+    "Special dividends and one-time payouts",
+
+    # — Funds and wrappers —
+    "What a fund is: pooling your money with other investors",
+    "Index funds explained without the jargon",
+    "ETFs versus mutual funds, and why the difference is mostly plumbing",
+    "What an expense ratio is, and how a small percentage compounds against you",
+    "Dividend-focused funds: what they hold and how they choose",
+    "High-yield funds and the trade-offs hidden inside them",
+    "What a closed-end fund is, and why it can trade above or below its assets",
+    "Return of capital: when a payout is really just your own money back",
+
+    # — Real estate income —
+    "REITs explained: owning buildings without owning a building",
+    "How REITs are required to pay out most of their income",
+    "Equity REITs versus mortgage REITs",
+    "Reading a REIT: funds from operations instead of ordinary earnings",
+    "Residential, retail, industrial, and specialty REITs at a glance",
+
+    # — Bonds and lending your money —
+    "What a bond is: lending money and being paid to wait",
+    "Coupon, par value, and maturity in everyday terms",
+    "Why bond prices fall when interest rates rise",
+    "Duration: how sensitive a bond is to changing rates",
+    "Credit ratings and what investment grade really signals",
+    "Corporate bonds, municipal bonds, and government bonds compared",
+    "High-yield (junk) bonds and the risk you take for the extra income",
+    "Treasury bills, notes, and bonds: the plainest loan in the market",
+    "TIPS and inflation-protected bonds",
+    "I bonds and savings bonds for ordinary savers",
+    "What a bond ladder is, and why staggering maturities smooths the ride",
+    "Building your first bond ladder, rung by rung",
+    "Bond funds versus owning individual bonds",
+
+    # — Cash and near-cash income —
+    "Certificates of deposit (CDs) and how locking up money buys you a higher rate",
+    "CD ladders: the same idea as a bond ladder, at the bank",
+    "High-yield savings accounts and money market funds",
+    "FDIC and SIPC insurance: what is actually protected, and what is not",
+    "The yield curve, explained with no math",
+
+    # — Other income strategies —
+    "Preferred shares: the hybrid between a stock and a bond",
+    "Covered calls: renting out shares you already own",
+    "Covered call funds and why their high payouts cap your upside",
+    "Business development companies (BDCs) in plain English",
+    "Master limited partnerships and the tax paperwork they bring",
+    "Annuities: what they promise and what they cost",
+
+    # — Putting it to work —
+    "DRIP: automatically reinvesting dividends back into more shares",
+    "Compounding, and why reinvested income does the heavy lifting",
+    "How dividends are taxed: qualified versus ordinary",
+    "Interest income and how it is taxed differently from dividends",
+    "Tax-advantaged accounts and why income investments often belong inside them",
+    "Asset location: deciding which holdings live in which account",
+    "Diversification across sectors so one bad year cannot break your income",
+    "Sequence of returns risk and why the order of good and bad years matters",
+    "Inflation: the quiet tax on a fixed income stream",
+    "The 4% rule and the honest debate around it",
+    "Designing an income portfolio around what you actually need each month",
+    "Bucketing: separating near-term spending money from long-term growth",
+    "Rebalancing an income portfolio without wrecking your yield",
+    "Dividend traps and other ways income investors get hurt",
+    "Fees, spreads, and the slow leaks in a portfolio",
+    "Writing a one-page plan you can actually stick to",
+]
+
+
+def daily_lesson(today: datetime.date) -> tuple:
+    """Return (lesson_number, topic, next_topic) for `today`.
+
+    Lesson 1 lands on LAUNCH_DATE. The curriculum wraps around with modulo if
+    it ever runs out, so the newsletter never runs dry.
+    """
+    days = max(0, (today - LAUNCH_DATE).days)
+    idx = days % len(CURRICULUM)
+    next_idx = (days + 1) % len(CURRICULUM)
+    return days + 1, CURRICULUM[idx], CURRICULUM[next_idx]
+
+
 WMO_DESCRIPTIONS = {
     0:  "Sunny",
     1:  "Mostly Sunny",
@@ -316,6 +418,7 @@ def fetch_all_news() -> dict:
 
 def build_prompt(today: datetime.date, weather: dict, markets: dict, news: dict, wordle_word: str) -> str:
     date_str = today.strftime(f"%A, %B {today.day}, %Y")
+    lesson_number, lesson_topic, next_topic = daily_lesson(today)
 
     # Market block
     mkt_lines = []
@@ -372,6 +475,19 @@ NEWS — HOME, GARDEN & PLANTS:
 
 NEWS — DOGS & ANIMALS:
 {fmt_news(news.get('dogs', []))}
+
+STIPENDIO PIGRO — TODAY'S INCOME-INVESTING LESSON:
+  Lesson number: {lesson_number}
+  Today's topic: {lesson_topic}
+  Tomorrow's topic: {next_topic}
+
+  Write "Lesson {lesson_number}: {lesson_topic}" as pigro_headline, word for word.
+  Write pigro_body as 4–6 sentences explaining today's topic in warm, plain English
+  to a complete beginner who has never invested before. Assume no prior knowledge and
+  define any term you use. This is strictly educational: never name specific stocks,
+  funds, or tickers as recommendations, never tell the reader what to buy or sell, and
+  never give personalized financial advice. Close with a one-sentence tease of
+  tomorrow's topic ({next_topic}).
 """
 
     schema_section = f"""\
@@ -387,28 +503,8 @@ Source URLs must be copied EXACTLY from the RSS data above. Use "" if none is av
   "ogt_source_name": "Publication name",
   "ogt_source_url": "Exact URL from RSS data, or empty string",
 
-  "portugal_items": [
-    {{
-      "color": "green",
-      "topic": "GOLDEN VISA",
-      "detail": "1–2 sentences about current Golden Visa / D8 digital nomad visa status or recent changes."
-    }},
-    {{
-      "color": "yellow",
-      "topic": "COST OF LIVING",
-      "detail": "1–2 sentences about current cost-of-living trends in Lisbon, Porto, or the Algarve."
-    }},
-    {{
-      "color": "green",
-      "topic": "NHR TAX REGIME",
-      "detail": "1–2 sentences about the NHR or IFICI tax benefit for new residents."
-    }},
-    {{
-      "color": "yellow",
-      "topic": "HOUSING MARKET",
-      "detail": "1–2 sentences about the rental or property market in Portugal."
-    }}
-  ],
+  "pigro_headline": "Exactly: Lesson {lesson_number}: {lesson_topic}",
+  "pigro_body": "4–6 sentences teaching today's lesson topic to a complete beginner (see the STIPENDIO PIGRO brief above). End with a one-sentence tease of tomorrow's topic.",
 
   "parola_word": "An Italian word — chosen to be beautiful, useful, or evocative",
   "parola_pronunciation": "/phonetic pronunciation/ (e.g. /ah-MOH-reh/)",
@@ -463,8 +559,7 @@ Source URLs must be copied EXACTLY from the RSS data above. Use "" if none is av
 }}
 
 RULES:
-1. portugal_items: always return exactly 4 items. Colors must be "green", "yellow", or "red".
-   green = encouraging/good news, yellow = neutral/watch, red = challenge/headwind.
+1. pigro_headline must be exactly "Lesson {lesson_number}: {lesson_topic}" — no rewording.
 2. World news: lean toward culture, science, human progress. Avoid gratuitous conflict/politics.
    Use actual stories from the RSS data above — do not invent sources or URLs.
 3. Garden: if garden RSS has relevant articles, use them. If not, synthesize practical advice
@@ -474,32 +569,6 @@ RULES:
 """
 
     return data_section + schema_section
-
-
-# ─── Portugal watch renderer ──────────────────────────────────────────────────
-
-def render_portugal_items(items: list) -> str:
-    if not items:
-        return ""
-    lines = []
-    for item in items:
-        color = item.get("color", "yellow").lower()
-        if color not in ("green", "yellow", "red"):
-            color = "yellow"
-        topic = item.get("topic", "").upper()
-        detail = item.get("detail", "")
-        # Map color to check character
-        check_char = "✓" if color == "green" else ("✗" if color == "red" else "~")
-        lines.append(
-            f'<div class="portugal-item">\n'
-            f'  <div class="portugal-check {color}">{check_char}</div>\n'
-            f'  <div>\n'
-            f'    <div class="portugal-topic">{topic}</div>\n'
-            f'    <div class="portugal-detail">{detail}</div>\n'
-            f'  </div>\n'
-            f'</div>'
-        )
-    return "\n".join(lines)
 
 
 # ─── JSON repair ─────────────────────────────────────────────────────────────
@@ -655,9 +724,6 @@ def main():
     nasdaq_price, nasdaq_change, nasdaq_dir = mkt("nasdaq")
     t10y_price,   t10y_change,   t10y_dir   = mkt("treasury10y")
 
-    # Portugal watch HTML
-    portugal_html = render_portugal_items(data.get("portugal_items", []))
-
     tokens = {
         # Header
         "DATE_DISPLAY":       date_display,
@@ -684,8 +750,9 @@ def main():
         "MARKET_10Y_PRICE":     t10y_price,
         "MARKET_10Y_CHANGE":    t10y_change,
         "MARKET_10Y_DIR":       t10y_dir,
-        # Portugal watch
-        "PORTUGAL_ITEMS":     portugal_html,
+        # Stipendio Pigro
+        "PIGRO_HEADLINE":     data.get("pigro_headline", ""),
+        "PIGRO_BODY":         data.get("pigro_body", ""),
         # Parola del Giorno
         "PAROLA_WORD":          data.get("parola_word", ""),
         "PAROLA_PRONUNCIATION": data.get("parola_pronunciation", ""),

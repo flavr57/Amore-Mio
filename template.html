@@ -236,54 +236,6 @@
         .market-card .change.up { color: var(--green); }
         .market-card .change.down { color: var(--red); }
 
-        /* ── PORTUGAL WATCH ─────────────────────── */
-        .portugal-grid {
-            display: grid;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .portugal-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px 16px;
-            background: var(--card-bg);
-            border: 1px solid var(--rule-light);
-        }
-
-        .portugal-check {
-            flex-shrink: 0;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-top: 2px;
-        }
-
-        .portugal-check.green { background: var(--green); color: white; }
-        .portugal-check.yellow { background: var(--gold); color: white; }
-        .portugal-check.red { background: var(--red); color: white; }
-
-        .portugal-topic {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--ink-light);
-            margin-bottom: 2px;
-        }
-
-        .portugal-detail {
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
         /* ── PAROLA DEL GIORNO ──────────────────── */
         .parola-card {
             background: var(--card-bg);
@@ -670,12 +622,14 @@
         </div>
     </section>
 
-    <!-- ── PORTOGALLO ─────────────────────────────── -->
+    <!-- ── STIPENDIO PIGRO ────────────────────────── -->
     <section class="section">
-        <div class="section-label">Portogallo</div>
-        <div class="section-title">Notizie dal Portogallo</div>
-        <div class="portugal-grid">
-            {{PORTUGAL_ITEMS}}
+        <div class="section-label">Stipendio Pigro</div>
+        <div class="section-title">Soldi che Lavorano</div>
+
+        <div class="article-block">
+            <div class="article-headline">{{PIGRO_HEADLINE}}</div>
+            <div class="article-body">{{PIGRO_BODY}}</div>
         </div>
     </section>
 
