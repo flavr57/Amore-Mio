@@ -168,13 +168,14 @@ HERMOSA_LON = -118.3995
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ─── Stipendio Pigro — income-investing rotation ──────────────────────────────
-# One named vehicle or strategy per day, ordered from most accessible to more
-# advanced, starting from LAUNCH_DATE.
+# ─── Stipendio Pigro — daily rotation ─────────────────────────────────────────
+# Two tracks woven together: named income vehicles, and tax strategies for a
+# self-employed owner with teenagers at home. One subject per day, each track
+# ordered from most accessible to more advanced, starting from LAUNCH_DATE.
 
 LAUNCH_DATE = datetime.date(2026, 8, 18)
 
-CURRICULUM = [
+INCOME_TOPICS = [
     # — Cash and government paper: the most accessible income there is —
     "High-yield savings accounts at online banks, and how they differ from a brick-and-mortar savings account",
     "Money market funds like Vanguard's VMFXX and Fidelity's SPAXX, and what sits inside them",
@@ -266,14 +267,81 @@ CURRICULUM = [
 ]
 
 
+TAX_TOPICS = [
+    # — The returns you already file —
+    "Quarterly estimated taxes, and the safe-harbor rule that keeps penalties off your return",
+    "The home office deduction: simplified method versus actual expenses",
+    "Vehicle write-offs — standard mileage versus actual cost — and the log that backs them up",
+    "Section 179 and bonus depreciation when the business buys equipment",
+    "Record-keeping that holds up: substantiating a Schedule C before anyone asks",
+
+    # — Structure and the owner's own paycheck —
+    "The QBI deduction under Section 199A, and who qualifies for the 20%",
+    "Sole proprietorship, LLC, and S-corp — what actually changes at each step",
+    "Electing S-corp status and the reasonable salary the IRS expects with it",
+    "An accountable plan for reimbursing yourself for business use of personal things",
+    "The Augusta rule: renting your own home to your business for up to 14 days",
+    "The self-employed health insurance deduction",
+
+    # — Family payroll —
+    "Hiring your teenagers into the business and putting them on real payroll",
+    "The payroll tax exemption for a child employed by a parent's sole proprietorship",
+    "What counts as real work: job descriptions, timesheets, and defensible pay",
+    "Funding a custodial Roth IRA with a teenager's earned income",
+    "The kiddie tax, and how a teenager's investment income gets taxed",
+
+    # — Retirement accounts as tax shelters —
+    "The SEP IRA, and why it is the simplest plan a solo business can open",
+    "The solo 401(k), and contributing as both employee and employer",
+    "Stacking contributions across accounts in a single tax year",
+    "The backdoor Roth IRA when income runs past the contribution limit",
+    "The mega backdoor Roth inside a solo 401(k)",
+    "The HSA triple tax advantage — and investing the balance instead of spending it",
+
+    # — Paying for college, and the investment side —
+    "529 plans, and the state tax deduction many of them carry",
+    "Rolling leftover 529 money into a Roth IRA under SECURE 2.0",
+    "The American Opportunity Tax Credit for a kid starting college",
+    "Qualified dividends versus ordinary income, and the gap between the two rates",
+    "The 0% long-term capital gains bracket, and harvesting gains inside it",
+    "Tax-loss harvesting, and the wash sale rule that undoes a sloppy one",
+    "Standard deduction versus itemizing, and bunching gifts through a donor-advised fund",
+]
+
+
+def _weave(income: list, tax: list) -> list:
+    """Interleave the two tracks so tax subjects land every few days.
+
+    Returns a list of (topic, is_tax) pairs. Tax subjects are spread evenly
+    across the whole rotation rather than clumped at one end.
+    """
+    woven = []
+    used = 0
+    for i, topic in enumerate(income, 1):
+        woven.append((topic, False))
+        due = round(i * len(tax) / len(income))
+        while used < due:
+            woven.append((tax[used], True))
+            used += 1
+    while used < len(tax):
+        woven.append((tax[used], True))
+        used += 1
+    return woven
+
+
+CURRICULUM = _weave(INCOME_TOPICS, TAX_TOPICS)
+
+
 def daily_topic(today: datetime.date) -> tuple:
-    """Return (topic, next_topic) for `today`.
+    """Return (topic, is_tax, next_topic) for `today`.
 
     The rotation starts on LAUNCH_DATE and wraps around with modulo if it ever
     runs out, so the newsletter never runs dry.
     """
     days = max(0, (today - LAUNCH_DATE).days)
-    return CURRICULUM[days % len(CURRICULUM)], CURRICULUM[(days + 1) % len(CURRICULUM)]
+    topic, is_tax = CURRICULUM[days % len(CURRICULUM)]
+    next_topic = CURRICULUM[(days + 1) % len(CURRICULUM)][0]
+    return topic, is_tax, next_topic
 
 
 WMO_DESCRIPTIONS = {
@@ -424,7 +492,24 @@ def fetch_all_news() -> dict:
 
 def build_prompt(today: datetime.date, weather: dict, markets: dict, news: dict, wordle_word: str) -> str:
     date_str = today.strftime(f"%A, %B {today.day}, %Y")
-    pigro_topic, next_topic = daily_topic(today)
+    pigro_topic, pigro_is_tax, next_topic = daily_topic(today)
+
+    if pigro_is_tax:
+        pigro_kind = """\
+  Today's subject is a TAX STRATEGY piece. The reader is a self-employed business
+  owner with two teenagers at home (16 and 18), so frame it for someone running their
+  own shop with kids old enough to work and to be heading toward college.
+  For beat 5, the research thread must name the relevant IRS section, form number, or
+  publication — or an exact phrase to search — so the reader knows precisely what to
+  pull up. Somewhere in the piece, in ONE natural sentence woven into the prose, note
+  that this is general information, that these rules shift, and that a CPA should sign
+  off before anyone acts on it. Make it sound like a friend being straight with you,
+  not a disclaimer block, and never set it apart as its own closing paragraph."""
+    else:
+        pigro_kind = """\
+  Today's subject is an INCOME VEHICLE piece. For beat 5, the research thread should
+  be a specific, concrete next step — a fund family to compare, a filing or fact sheet
+  to pull, a screen to run."""
 
     # Market block
     mkt_lines = []
@@ -482,13 +567,14 @@ NEWS — HOME, GARDEN & PLANTS:
 NEWS — DOGS & ANIMALS:
 {fmt_news(news.get('dogs', []))}
 
-STIPENDIO PIGRO — TODAY'S INCOME-INVESTING SPOTLIGHT:
+STIPENDIO PIGRO — TODAY'S SPOTLIGHT:
   Today's subject: {pigro_topic}
   Tomorrow's subject: {next_topic}
 
-  This section spotlights ONE real, named income-investing vehicle or strategy each
-  day — something the reader can go look up the moment they finish reading. Name real
-  funds, real well-known companies, real account types. Be specific and concrete.
+  This section spotlights ONE real, named income vehicle or tax strategy each day —
+  something the reader can go look up the moment they finish reading. Name real funds,
+  real well-known companies, real account types, real IRS provisions. Be specific and
+  concrete.
 
   pigro_headline: a natural editorial headline for today's subject (6–12 words). No
   numbering, and never the words "lesson", "course", "class", "part", or "day one".
@@ -496,15 +582,21 @@ STIPENDIO PIGRO — TODAY'S INCOME-INVESTING SPOTLIGHT:
 
   pigro_body: 5–7 sentences, in this order —
     1. What it is, plainly and concretely.
-    2. Roughly what it has typically paid. Use a historical typical RANGE, phrased
-       loosely — "has generally run in the 4–6% range", "historically closer to 2–3%".
-       You have NO live market data, so never quote a precise current yield, price,
-       or dividend amount, and never state a figure as though it were today's number.
-    3. Why income investors reach for it — the actual mechanism that produces the cash.
+    2. Roughly what it is worth. For an income vehicle, what it has typically paid,
+       as a loose historical RANGE — "has generally run in the 4–6% range",
+       "historically closer to 2–3%". For a tax strategy, the rough scale of what it
+       tends to save or shelter, in the same loose register. You have NO live market
+       data and no current-year tax tables, so never quote a precise yield, price,
+       dividend, limit, or threshold as though it were this year's number — keep
+       figures approximate and say so.
+    3. Why people reach for it — the actual mechanism that produces the cash or the
+       saving.
     4. The honest trade-off or thing to watch, in a sentence.
     5. What to look into next — a specific, concrete research thread the reader can pull.
     Then close with a conversational one-line tease of tomorrow's subject
     ({next_topic}). Keep the tease natural, like a friend saying what's coming.
+
+{pigro_kind}
 
   Register: peer to peer, one smart adult to another. Assume the reader is capable and
   curious — do not talk down, do not over-define ordinary words, do not open with
@@ -512,9 +604,9 @@ STIPENDIO PIGRO — TODAY'S INCOME-INVESTING SPOTLIGHT:
   work so it pays you.
 
   Hard rules: frame everything as ideas worth researching, never as recommendations to
-  buy or sell. Give no personalized advice and make no promises about future
-  performance. Naming a fund or company as an example to study is expected and good;
-  telling the reader to purchase it is not.
+  buy, sell, or file. Give no personalized advice and make no promises about future
+  performance or tax outcomes. Naming a fund, a company, or an IRS provision as
+  something to study is expected and good; telling the reader to act on it is not.
 """
 
     schema_section = f"""\
@@ -530,7 +622,7 @@ Source URLs must be copied EXACTLY from the RSS data above. Use "" if none is av
   "ogt_source_name": "Publication name",
   "ogt_source_url": "Exact URL from RSS data, or empty string",
 
-  "pigro_headline": "Natural editorial headline (6–12 words) for today's income subject: {pigro_topic}. No numbering, no 'lesson'/'course'/'class' wording.",
+  "pigro_headline": "Natural editorial headline (6–12 words) for today's subject: {pigro_topic}. No numbering, no 'lesson'/'course'/'class' wording.",
   "pigro_body": "5–7 sentences spotlighting {pigro_topic} — see the STIPENDIO PIGRO brief above for the required structure, register, and rules. Close with a conversational one-line tease of tomorrow's subject.",
 
   "parola_word": "An Italian word — chosen to be beautiful, useful, or evocative",
@@ -586,9 +678,11 @@ Source URLs must be copied EXACTLY from the RSS data above. Use "" if none is av
 }}
 
 RULES:
-1. Stipendio Pigro: name real funds, companies, and account types as things to research.
-   Never a recommendation to buy, never personalized advice, never a promised return,
-   and never a precise current yield or price — typical historical ranges only.
+1. Stipendio Pigro: name real funds, companies, account types, and IRS provisions as
+   things to research. Never a recommendation to act, never personalized advice, never
+   a promised return, and never a precise current yield, price, or tax figure —
+   approximate historical ranges only. Tax pieces must note, in one natural sentence,
+   that rules change and a CPA should confirm before acting.
 2. World news: lean toward culture, science, human progress. Avoid gratuitous conflict/politics.
    Use actual stories from the RSS data above — do not invent sources or URLs.
 3. Garden: if garden RSS has relevant articles, use them. If not, synthesize practical advice
