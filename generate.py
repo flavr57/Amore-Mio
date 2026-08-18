@@ -168,106 +168,112 @@ HERMOSA_LON = -118.3995
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ─── Stipendio Pigro — income-investing curriculum ────────────────────────────
-# One lesson per day, in teaching order, starting from LAUNCH_DATE.
+# ─── Stipendio Pigro — income-investing rotation ──────────────────────────────
+# One named vehicle or strategy per day, ordered from most accessible to more
+# advanced, starting from LAUNCH_DATE.
 
 LAUNCH_DATE = datetime.date(2026, 8, 18)
 
 CURRICULUM = [
-    # — Foundations: what income investing even is —
-    "What income investing means, and how it differs from investing for growth",
-    "What a dividend actually is, in plain language",
-    "Why a company would choose to pay out cash instead of keeping it",
-    "How a share of stock makes you a part-owner entitled to a slice of profits",
-    "The four dates that matter: declaration, ex-dividend, record, and payment",
-    "How dividend yield is calculated, and what the percentage really tells you",
-    "Why a very high yield is often a warning sign rather than a bargain",
-    "Total return: why price growth and dividends have to be counted together",
-    "What a payout ratio is, and how it hints at whether a dividend is safe",
-    "Free cash flow: the number that actually pays your dividend",
-    "Dividend growth versus dividend size, and why the slower one often wins",
-    "What dividend aristocrats and dividend kings are, and what the labels mean",
-    "What happens when a company cuts its dividend, and why it matters so much",
-    "Quarterly, monthly, and annual payers: how payment schedules differ",
-    "Special dividends and one-time payouts",
+    # — Cash and government paper: the most accessible income there is —
+    "High-yield savings accounts at online banks, and how they differ from a brick-and-mortar savings account",
+    "Money market funds like Vanguard's VMFXX and Fidelity's SPAXX, and what sits inside them",
+    "Treasury bills bought directly at TreasuryDirect, and the auction process",
+    "Short-term Treasury ETFs like SGOV and BIL as a parking place for cash",
+    "Series I savings bonds and their inflation-linked rate structure",
+    "Certificates of deposit, and how a CD ladder staggers your maturities",
+    "Brokered CDs bought inside a brokerage account instead of at a bank",
+    "Building a Treasury ladder with individual bills and notes",
+    "TIPS and inflation-protected Treasury funds like SCHP and VTIP",
 
-    # — Funds and wrappers —
-    "What a fund is: pooling your money with other investors",
-    "Index funds explained without the jargon",
-    "ETFs versus mutual funds, and why the difference is mostly plumbing",
-    "What an expense ratio is, and how a small percentage compounds against you",
-    "Dividend-focused funds: what they hold and how they choose",
-    "High-yield funds and the trade-offs hidden inside them",
-    "What a closed-end fund is, and why it can trade above or below its assets",
-    "Return of capital: when a payout is really just your own money back",
+    # — Broad dividend equity funds: the workhorses —
+    "SCHD, the Schwab US Dividend Equity ETF, and the quality screen behind it",
+    "VYM, Vanguard's High Dividend Yield fund, and what a market-cap-weighted yield tilt buys you",
+    "VIG and DGRO, the dividend growth funds that favor rising payouts over big ones",
+    "NOBL and the Dividend Aristocrats: companies with 25+ straight years of raises",
+    "The Dividend Kings list and what 50 years of increases actually signals",
+    "DIVO and other actively managed dividend funds",
+    "VYMI and international dividend funds, and the withholding tax wrinkle",
+    "Canadian bank dividends and the long payout records behind them",
+    "Expense ratios, and how to compare two dividend funds that look identical",
+
+    # — Named dividend payers worth studying —
+    "Coca-Cola and Procter & Gamble as the textbook dividend growth companies",
+    "Johnson & Johnson, and what a AAA-rated balance sheet meant for its payout",
+    "Utilities like Southern Company and Duke Energy, and the regulated-monopoly model",
+    "The XLU utilities sector fund as a one-click version of that trade",
+    "Consumer staples: Colgate, PepsiCo, and why boring products fund steady checks",
+    "Verizon and AT&T, and the cautionary tale of a very high yield with no growth",
+    "Exxon Mobil and Chevron, and how commodity cycles ripple through a dividend",
+    "AbbVie and pharma dividends funded by patent-protected cash flows",
+    "Dividend reinvestment plans (DRIPs) and buying fractional shares automatically",
 
     # — Real estate income —
-    "REITs explained: owning buildings without owning a building",
-    "How REITs are required to pay out most of their income",
-    "Equity REITs versus mortgage REITs",
-    "Reading a REIT: funds from operations instead of ordinary earnings",
-    "Residential, retail, industrial, and specialty REITs at a glance",
+    "Realty Income (O), the monthly dividend company, and the triple-net lease model",
+    "Prologis and industrial warehouse REITs riding the logistics buildout",
+    "American Tower and Crown Castle: cell towers as landlord businesses",
+    "Digital Realty and Equinix, the data center REITs behind the internet",
+    "Public Storage and the self-storage REIT model",
+    "Welltower and Omega Healthcare: senior housing and medical facility REITs",
+    "AvalonBay and Mid-America, the big apartment REITs",
+    "VNQ and SCHH, the broad REIT index funds",
+    "Reading a REIT with FFO and AFFO instead of ordinary earnings",
+    "Mortgage REITs like AGNC and Annaly, and why their yields run so high",
+    "Weyerhaeuser and timber REITs, plus farmland vehicles like FPI",
 
-    # — Bonds and lending your money —
-    "What a bond is: lending money and being paid to wait",
-    "Coupon, par value, and maturity in everyday terms",
-    "Why bond prices fall when interest rates rise",
-    "Duration: how sensitive a bond is to changing rates",
-    "Credit ratings and what investment grade really signals",
-    "Corporate bonds, municipal bonds, and government bonds compared",
-    "High-yield (junk) bonds and the risk you take for the extra income",
-    "Treasury bills, notes, and bonds: the plainest loan in the market",
-    "TIPS and inflation-protected bonds",
-    "I bonds and savings bonds for ordinary savers",
-    "What a bond ladder is, and why staggering maturities smooths the ride",
-    "Building your first bond ladder, rung by rung",
-    "Bond funds versus owning individual bonds",
+    # — Bonds and credit —
+    "BND and AGG, the total bond market funds most portfolios start with",
+    "LQD and VCIT, the investment-grade corporate bond funds",
+    "Municipal bond funds like VTEB and MUB, and federally tax-free interest",
+    "State-specific muni funds and the double-tax-free question",
+    "HYG and JNK: high-yield bonds and the credit risk you are paid for",
+    "Target-maturity bond ETFs — iShares iBonds and Invesco BulletShares — that mature like a bond",
+    "Buying individual corporate bonds and laddering them yourself",
+    "Floating-rate and bank loan funds like BKLN when rates are rising",
+    "Emerging market bond funds and the currency question inside them",
+    "Duration, and how to tell whether a bond fund will lurch when rates move",
 
-    # — Cash and near-cash income —
-    "Certificates of deposit (CDs) and how locking up money buys you a higher rate",
-    "CD ladders: the same idea as a bond ladder, at the bank",
-    "High-yield savings accounts and money market funds",
-    "FDIC and SIPC insurance: what is actually protected, and what is not",
-    "The yield curve, explained with no math",
+    # — Options income —
+    "JEPI, JPMorgan's equity premium income ETF, and how it manufactures a monthly payout",
+    "JEPQ, the Nasdaq-flavored sibling, and its higher volatility premium",
+    "QYLD and XYLD, and the upside you surrender for a fat covered call yield",
+    "SPYI and newer covered call funds using index options",
+    "Writing covered calls yourself on shares you already own",
+    "Cash-secured puts as a way to get paid while waiting to buy",
+    "Buffer and defined-outcome ETFs, and what the downside cushion costs",
 
-    # — Other income strategies —
-    "Preferred shares: the hybrid between a stock and a bond",
-    "Covered calls: renting out shares you already own",
-    "Covered call funds and why their high payouts cap your upside",
-    "Business development companies (BDCs) in plain English",
-    "Master limited partnerships and the tax paperwork they bring",
-    "Annuities: what they promise and what they cost",
+    # — Higher-yield specialists —
+    "Preferred shares and PFF, the hybrid sitting between stocks and bonds",
+    "Baby bonds: exchange-traded debt in $25 pieces",
+    "Main Street Capital (MAIN) and the business development company model",
+    "Ares Capital (ARCC) and Hercules Capital, the larger BDC lenders",
+    "BIZD, the BDC index fund, and its unusual reported expense ratio",
+    "Closed-end funds, and why they trade at a discount or premium to NAV",
+    "PIMCO closed-end funds like PDI and PTY, and their leverage",
+    "Utility and infrastructure CEFs such as UTF",
+    "Enterprise Products and Energy Transfer: MLPs, distributions, and K-1 forms",
+    "AMLP and MLPA, the fund wrappers that spare you the K-1",
+    "Williams and Kinder Morgan: midstream energy as a corporation instead of an MLP",
+    "Royalty trusts and the finite-life income they throw off",
+    "Interval funds and the private credit vehicles now open to ordinary investors",
 
-    # — Putting it to work —
-    "DRIP: automatically reinvesting dividends back into more shares",
-    "Compounding, and why reinvested income does the heavy lifting",
-    "How dividends are taxed: qualified versus ordinary",
-    "Interest income and how it is taxed differently from dividends",
-    "Tax-advantaged accounts and why income investments often belong inside them",
-    "Asset location: deciding which holdings live in which account",
-    "Diversification across sectors so one bad year cannot break your income",
-    "Sequence of returns risk and why the order of good and bad years matters",
-    "Inflation: the quiet tax on a fixed income stream",
-    "The 4% rule and the honest debate around it",
-    "Designing an income portfolio around what you actually need each month",
-    "Bucketing: separating near-term spending money from long-term growth",
-    "Rebalancing an income portfolio without wrecking your yield",
-    "Dividend traps and other ways income investors get hurt",
-    "Fees, spreads, and the slow leaks in a portfolio",
-    "Writing a one-page plan you can actually stick to",
+    # — Putting the pieces together —
+    "Using a Roth IRA as the wrapper where income compounds untaxed",
+    "Asset location: which income holdings belong in a taxable account and which do not",
+    "Qualified versus ordinary dividends, and the tax gap between them",
+    "Building a monthly income calendar from quarterly payers",
+    "The bucket approach: separating spending cash from long-term income growth",
 ]
 
 
-def daily_lesson(today: datetime.date) -> tuple:
-    """Return (lesson_number, topic, next_topic) for `today`.
+def daily_topic(today: datetime.date) -> tuple:
+    """Return (topic, next_topic) for `today`.
 
-    Lesson 1 lands on LAUNCH_DATE. The curriculum wraps around with modulo if
-    it ever runs out, so the newsletter never runs dry.
+    The rotation starts on LAUNCH_DATE and wraps around with modulo if it ever
+    runs out, so the newsletter never runs dry.
     """
     days = max(0, (today - LAUNCH_DATE).days)
-    idx = days % len(CURRICULUM)
-    next_idx = (days + 1) % len(CURRICULUM)
-    return days + 1, CURRICULUM[idx], CURRICULUM[next_idx]
+    return CURRICULUM[days % len(CURRICULUM)], CURRICULUM[(days + 1) % len(CURRICULUM)]
 
 
 WMO_DESCRIPTIONS = {
@@ -418,7 +424,7 @@ def fetch_all_news() -> dict:
 
 def build_prompt(today: datetime.date, weather: dict, markets: dict, news: dict, wordle_word: str) -> str:
     date_str = today.strftime(f"%A, %B {today.day}, %Y")
-    lesson_number, lesson_topic, next_topic = daily_lesson(today)
+    pigro_topic, next_topic = daily_topic(today)
 
     # Market block
     mkt_lines = []
@@ -476,18 +482,39 @@ NEWS — HOME, GARDEN & PLANTS:
 NEWS — DOGS & ANIMALS:
 {fmt_news(news.get('dogs', []))}
 
-STIPENDIO PIGRO — TODAY'S INCOME-INVESTING LESSON:
-  Lesson number: {lesson_number}
-  Today's topic: {lesson_topic}
-  Tomorrow's topic: {next_topic}
+STIPENDIO PIGRO — TODAY'S INCOME-INVESTING SPOTLIGHT:
+  Today's subject: {pigro_topic}
+  Tomorrow's subject: {next_topic}
 
-  Write "Lesson {lesson_number}: {lesson_topic}" as pigro_headline, word for word.
-  Write pigro_body as 4–6 sentences explaining today's topic in warm, plain English
-  to a complete beginner who has never invested before. Assume no prior knowledge and
-  define any term you use. This is strictly educational: never name specific stocks,
-  funds, or tickers as recommendations, never tell the reader what to buy or sell, and
-  never give personalized financial advice. Close with a one-sentence tease of
-  tomorrow's topic ({next_topic}).
+  This section spotlights ONE real, named income-investing vehicle or strategy each
+  day — something the reader can go look up the moment they finish reading. Name real
+  funds, real well-known companies, real account types. Be specific and concrete.
+
+  pigro_headline: a natural editorial headline for today's subject (6–12 words). No
+  numbering, and never the words "lesson", "course", "class", "part", or "day one".
+  Write it the way a good magazine would title the piece.
+
+  pigro_body: 5–7 sentences, in this order —
+    1. What it is, plainly and concretely.
+    2. Roughly what it has typically paid. Use a historical typical RANGE, phrased
+       loosely — "has generally run in the 4–6% range", "historically closer to 2–3%".
+       You have NO live market data, so never quote a precise current yield, price,
+       or dividend amount, and never state a figure as though it were today's number.
+    3. Why income investors reach for it — the actual mechanism that produces the cash.
+    4. The honest trade-off or thing to watch, in a sentence.
+    5. What to look into next — a specific, concrete research thread the reader can pull.
+    Then close with a conversational one-line tease of tomorrow's subject
+    ({next_topic}). Keep the tease natural, like a friend saying what's coming.
+
+  Register: peer to peer, one smart adult to another. Assume the reader is capable and
+  curious — do not talk down, do not over-define ordinary words, do not open with
+  "imagine that". The energy is inspiring and actionable: here is how money gets put to
+  work so it pays you.
+
+  Hard rules: frame everything as ideas worth researching, never as recommendations to
+  buy or sell. Give no personalized advice and make no promises about future
+  performance. Naming a fund or company as an example to study is expected and good;
+  telling the reader to purchase it is not.
 """
 
     schema_section = f"""\
@@ -503,8 +530,8 @@ Source URLs must be copied EXACTLY from the RSS data above. Use "" if none is av
   "ogt_source_name": "Publication name",
   "ogt_source_url": "Exact URL from RSS data, or empty string",
 
-  "pigro_headline": "Exactly: Lesson {lesson_number}: {lesson_topic}",
-  "pigro_body": "4–6 sentences teaching today's lesson topic to a complete beginner (see the STIPENDIO PIGRO brief above). End with a one-sentence tease of tomorrow's topic.",
+  "pigro_headline": "Natural editorial headline (6–12 words) for today's income subject: {pigro_topic}. No numbering, no 'lesson'/'course'/'class' wording.",
+  "pigro_body": "5–7 sentences spotlighting {pigro_topic} — see the STIPENDIO PIGRO brief above for the required structure, register, and rules. Close with a conversational one-line tease of tomorrow's subject.",
 
   "parola_word": "An Italian word — chosen to be beautiful, useful, or evocative",
   "parola_pronunciation": "/phonetic pronunciation/ (e.g. /ah-MOH-reh/)",
@@ -559,7 +586,9 @@ Source URLs must be copied EXACTLY from the RSS data above. Use "" if none is av
 }}
 
 RULES:
-1. pigro_headline must be exactly "Lesson {lesson_number}: {lesson_topic}" — no rewording.
+1. Stipendio Pigro: name real funds, companies, and account types as things to research.
+   Never a recommendation to buy, never personalized advice, never a promised return,
+   and never a precise current yield or price — typical historical ranges only.
 2. World news: lean toward culture, science, human progress. Avoid gratuitous conflict/politics.
    Use actual stories from the RSS data above — do not invent sources or URLs.
 3. Garden: if garden RSS has relevant articles, use them. If not, synthesize practical advice
